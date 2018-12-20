@@ -4,14 +4,6 @@ Outputs:
     Value: !Sub https://${AWS::Region}-${AWS::StackName}-sentry.aws.dwos.com
 
 Parameters:
-  InfrastructureStack:
-    Type: String
-    Default: 'infrastructure'
-    Description: The infrastructure StackName
-  DBMultiAZ:
-    Type: String
-    Default: true
-    Description: Provides enhanced availablily for RDS
   RedisClusterNodes:
     Type: Number
     MinValue: 1
@@ -87,7 +79,7 @@ Parameters:
   SentryMailFrom:
     Description: Sending email address for sentry to use to send email
     Type: String
-    Default: 'noreply@dental-wings.com'
+    Default: 'noreply@example.com'
   SentryInstanceType:
     Description: The size of the EC2 instances
     Default: t2.medium
@@ -149,110 +141,67 @@ Resources:
     Type: Custom::GetParameterAsTags
     Version: 1.0
     Properties:
-      ServiceToken:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "TagParser"]]
+      ServiceToken: !GetAtt InfrastructureStack.Outputs.TagParser
       data: !Ref Tags
+
+  InfrastructureStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.ca-central-1.amazonaws.com/dentalwings-cloudformation-templates/aws-cloudformation-vpc-setup/cloudformation_vpc_creation.yml
+      Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
+      Parameters:
+        Tags: !If [hasTags, !Ref Tags, !Ref "AWS::NoValue"]
 
   RDSSubnet0:
     Type: 'AWS::EC2::Subnet'
     Condition: Create1stSubnet
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      VpcId: !GetAtt InfrastructureStack.Outputs.VPC
       AvailabilityZone: !Select [ 0, !GetAZs '' ]
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
-      CidrBlock: !Select
-        - 200
-        - !Cidr
-          - Fn::ImportValue:
-              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
-          - 256
-          - 8
+      CidrBlock: !Select [200, !Cidr [!GetAtt InfrastructureStack.Outputs.VPCCIDR , 256, 8]]
   RDSSubnet1:
     Type: 'AWS::EC2::Subnet'
     Condition: Create2ndSubnet
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      VpcId: !GetAtt InfrastructureStack.Outputs.VPC
       AvailabilityZone: !Select [ 1, !GetAZs '' ]
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
-      CidrBlock: !Select
-        - 201
-        - !Cidr
-          - Fn::ImportValue:
-              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
-          - 256
-          - 8
+      CidrBlock: !Select [201, !Cidr [!GetAtt InfrastructureStack.Outputs.VPCCIDR , 256, 8]]
   RDSSubnet2:
     Type: 'AWS::EC2::Subnet'
     Condition: Create3rdSubnet
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      VpcId: !GetAtt InfrastructureStack.Outputs.VPC
       AvailabilityZone: !Select [ 2, !GetAZs '' ]
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
-      CidrBlock: !Select
-        - 202
-        - !Cidr
-          - Fn::ImportValue:
-              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
-          - 256
-          - 8
+      CidrBlock: !Select [202, !Cidr [!GetAtt InfrastructureStack.Outputs.VPCCIDR , 256, 8]]
   RDSSubnet3:
     Type: 'AWS::EC2::Subnet'
     Condition: Create4thSubnet
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      VpcId: !GetAtt InfrastructureStack.Outputs.VPC
       AvailabilityZone: !Select [ 3, !GetAZs '' ]
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
-      CidrBlock: !Select
-        - 203
-        - !Cidr
-          - Fn::ImportValue:
-              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
-          - 256
-          - 8
+      CidrBlock: !Select [203, !Cidr [!GetAtt InfrastructureStack.Outputs.VPCCIDR , 256, 8]]
   RDSSubnet4:
     Type: 'AWS::EC2::Subnet'
     Condition: Create5thSubnet
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      VpcId: !GetAtt InfrastructureStack.Outputs.VPC
       AvailabilityZone: !Select [ 4, !GetAZs '' ]
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
-      CidrBlock: !Select
-        - 204
-        - !Cidr
-          - Fn::ImportValue:
-              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
-          - 256
-          - 8
+      CidrBlock: !Select [204, !Cidr [!GetAtt InfrastructureStack.Outputs.VPCCIDR , 256, 8]]
   RDSSubnet5:
     Type: 'AWS::EC2::Subnet'
     Condition: Create6thSubnet
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      VpcId: !GetAtt InfrastructureStack.Outputs.VPC
       AvailabilityZone: !Select [ 5, !GetAZs '' ]
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
-      CidrBlock: !Select
-        - 205
-        - !Cidr
-          - Fn::ImportValue:
-              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
-          - 256
-          - 8
+      CidrBlock: !Select [205, !Cidr [!GetAtt InfrastructureStack.Outputs.VPCCIDR , 256, 8]]
   RDSSubnetGroup:
     Type: "AWS::RDS::DBSubnetGroup"
-    Condition: Create2ndSubnet
     Properties:
       DBSubnetGroupDescription: "RDS Subnet Group"
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
@@ -268,98 +217,50 @@ Resources:
     Type: 'AWS::EC2::Subnet'
     Condition: Create1stSubnet
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      VpcId: !GetAtt InfrastructureStack.Outputs.VPC
       AvailabilityZone: !Select [ 0, !GetAZs '' ]
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
-      CidrBlock: !Select
-        - 210
-        - !Cidr
-          - Fn::ImportValue:
-              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
-          - 256
-          - 8
+      CidrBlock: !Select [210, !Cidr [!GetAtt InfrastructureStack.Outputs.VPCCIDR , 256, 8]]
   CacheSubnet1:
     Type: 'AWS::EC2::Subnet'
     Condition: Create2ndSubnet
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      VpcId: !GetAtt InfrastructureStack.Outputs.VPC
       AvailabilityZone: !Select [ 1, !GetAZs '' ]
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
-      CidrBlock: !Select
-        - 211
-        - !Cidr
-          - Fn::ImportValue:
-              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
-          - 256
-          - 8
+      CidrBlock: !Select [211, !Cidr [!GetAtt InfrastructureStack.Outputs.VPCCIDR , 256, 8]]
   CacheSubnet2:
     Type: 'AWS::EC2::Subnet'
     Condition: Create3rdSubnet
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      VpcId: !GetAtt InfrastructureStack.Outputs.VPC
       AvailabilityZone: !Select [ 2, !GetAZs '' ]
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
-      CidrBlock: !Select
-        - 212
-        - !Cidr
-          - Fn::ImportValue:
-              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
-          - 256
-          - 8
+      CidrBlock: !Select [212, !Cidr [!GetAtt InfrastructureStack.Outputs.VPCCIDR , 256, 8]]
   CacheSubnet3:
     Type: 'AWS::EC2::Subnet'
     Condition: Create4thSubnet
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      VpcId: !GetAtt InfrastructureStack.Outputs.VPC
       AvailabilityZone: !Select [ 3, !GetAZs '' ]
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
-      CidrBlock: !Select
-        - 213
-        - !Cidr
-          - Fn::ImportValue:
-              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
-          - 256
-          - 8
+      CidrBlock: !Select [213, !Cidr [!GetAtt InfrastructureStack.Outputs.VPCCIDR , 256, 8]]
   CacheSubnet4:
     Type: 'AWS::EC2::Subnet'
     Condition: Create5thSubnet
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      VpcId: !GetAtt InfrastructureStack.Outputs.VPC
       AvailabilityZone: !Select [ 4, !GetAZs '' ]
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
-      CidrBlock: !Select
-        - 214
-        - !Cidr
-          - Fn::ImportValue:
-              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
-          - 256
-          - 8
+      CidrBlock: !Select [214, !Cidr [!GetAtt InfrastructureStack.Outputs.VPCCIDR , 256, 8]]
   CacheSubnet5:
     Type: 'AWS::EC2::Subnet'
     Condition: Create6thSubnet
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      VpcId: !GetAtt InfrastructureStack.Outputs.VPC
       AvailabilityZone: !Select [ 5, !GetAZs '' ]
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
-      CidrBlock: !Select
-        - 215
-        - !Cidr
-          - Fn::ImportValue:
-              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
-          - 256
-          - 8
+      CidrBlock: !Select [215, !Cidr [!GetAtt InfrastructureStack.Outputs.VPCCIDR , 256, 8]]
   CacheSubnetGroup:
     Type: AWS::ElastiCache::SubnetGroup
     Properties:
@@ -376,9 +277,7 @@ Resources:
   PostgresAccessSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      VpcId:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      VpcId: !GetAtt InfrastructureStack.Outputs.VPC
       GroupDescription: Allows access postgres instance
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
   PostgresSecurityGroup:
@@ -389,26 +288,20 @@ Resources:
         IpProtocol: tcp
         FromPort: '5432'
         SourceSecurityGroupId: !Ref PostgresAccessSecurityGroup
-      VpcId:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      VpcId: !GetAtt InfrastructureStack.Outputs.VPC
       GroupDescription: postgres instance source
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
   CacheAccessSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: "This SG gives acces to the caching service"
-      VpcId:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      VpcId: !GetAtt InfrastructureStack.Outputs.VPC
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
   CacheSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: "Cache Security Group, allows acces from CacheAccessSecurityGroup"
-      VpcId:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      VpcId: !GetAtt InfrastructureStack.Outputs.VPC
       SecurityGroupIngress:
         - IpProtocol: "tcp"
           FromPort: "6379"
@@ -427,9 +320,7 @@ Resources:
         IpProtocol: tcp
         FromPort: '443'
         CidrIpv6: ::/0
-      VpcId:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      VpcId: !GetAtt InfrastructureStack.Outputs.VPC
       GroupDescription: An ELB group allowing access only to from the corresponding component
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
   SentrySecurityGroup:
@@ -448,9 +339,7 @@ Resources:
         FromPort: '22'
         IpProtocol: tcp
         CidrIpv6: ::/0
-      VpcId:
-        Fn::ImportValue:
-          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      VpcId: !GetAtt InfrastructureStack.Outputs.VPC
       GroupDescription: Sentry instance security group, gives access to from load balancer
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
 
@@ -493,10 +382,7 @@ Resources:
   SentryElasticLoadBalancer:
     Type: AWS::ElasticLoadBalancing::LoadBalancer
     Properties:
-      Subnets: !Split
-        - ','
-        - Fn::ImportValue:
-            !Join ['-', [!Ref InfrastructureStack, "PublicSubnets"]]
+      Subnets: !Split [',', !GetAtt InfrastructureStack.Outputs.PublicSubnets]
       Scheme: internet-facing
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
       Listeners:
@@ -602,10 +488,7 @@ Resources:
       MaxSize: !Ref SentryScalingMaxNodes
       LaunchConfigurationName: !Ref SentryLaunchConfiguration
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
-      VPCZoneIdentifier: !Split
-        - ','
-        - Fn::ImportValue:
-            !Join ['-', [!Ref InfrastructureStack, "PublicSubnets"]]
+      VPCZoneIdentifier: !Split [',', !GetAtt InfrastructureStack.Outputs.PublicSubnets]
 
   # ACM SSL Cert
   ACMSentrySSLCert:
