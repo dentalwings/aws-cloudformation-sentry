@@ -1,0 +1,30 @@
+language: ruby
+
+env:
+  global:
+  - AWS_DEFAULT_REGION=ca-central-1
+
+before_install:
+  - echo "Installing AWS CLI"
+  - pip install --upgrade --user awscli
+  - echo "Installing test gems"
+  - gem install yaml-lint
+
+script:
+  - aws cloudformation validate-template --template-body file://cloudformation_sentry.yml
+  - yaml-lint cloudformation_sentry.yml
+
+after_success:
+  - echo "Test Success - Branch($TRAVIS_BRANCH) Pull Request($TRAVIS_PULL_REQUEST) Tag($TRAVIS_TAG)"
+  - echo "Cloudformation templates validated"
+  - echo "YAML linted"
+
+deploy:
+  on:
+    branch: master
+  provider: s3
+  bucket: "dentalwings-cloudformation-templates"
+  skip_cleanup: true
+  acl: public_read
+  region: $AWS_DEFAULT_REGION
+  upload-dir: "aws-cloudformation-sentry"
