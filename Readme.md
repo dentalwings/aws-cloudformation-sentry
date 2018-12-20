@@ -33,6 +33,7 @@ or
 | --- |  --- | --- |
 | `DNSZoneId` | | HostZoneID from DNS |
 | `DNSZoneDomain` | | HostZoneDomain from DNS |
+| `CustomDNSHostname` | `${AWS::Region}-${AWS::StackName}-sentry` | Custom DNS Hostname, which overrides the dynamic generated one |
 | `Tags` |  `''` | A comma seperated list of key=value pairs |
 | `RedisClusterNodes` | `1` | Number of Redis Cluster Nodes |
 | `RedisInstanceType` | `cache.t2.micro` | InstanceClass for each Redis node |

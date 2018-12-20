@@ -1,9 +1,16 @@
 AWSTemplateFormatVersion: 2010-09-09
-Outputs:
-  SentryUrl:
-    Value: !Sub https://${AWS::Region}-${AWS::StackName}-sentry.aws.dwos.com
 
 Parameters:
+  DNSZoneId:
+    Type: String
+    Description: HostZoneID from DNS
+  DNSZoneDomain:
+    Type: String
+    Description: HostZoneDomain from DNS
+  CustomDNSHostname:
+    Type: String
+    Default: ''
+    Description: Custom DNS Hostname, which overrides the dynamic generated one
   RedisClusterNodes:
     Type: Number
     MinValue: 1
@@ -13,12 +20,6 @@ Parameters:
     Type: String
     Default: cache.t2.micro
     Description: InstanceClass for each Redis node.
-  DNSZoneId:
-    Type: String
-    Description: HostZoneID from DNS
-  DNSZoneDomain:
-    Type: String
-    Description: HostZoneDomain from DNS
   SSHKeyPairName:
     Type: String
     Default: None
@@ -127,6 +128,7 @@ Mappings:
     ca-central-1: {Subnet1: true, Subnet2: true, Subnet3: false, Subnet4: false, Subnet5: false, Subnet6: false}
 
 Conditions:
+  UseCustomDNSHostname: !Not [!Equals ['', !Ref CustomDNSHostname]]
   UseSSHKeyPairName: !Not [!Equals ['None', !Ref SSHKeyPairName]]
   hasTags: !Not [!Equals ['', !Ref Tags]]
   Create1stSubnet: !Equals [!FindInMap [ Regions, !Ref "AWS::Region", "Subnet1" ], true]
@@ -405,8 +407,9 @@ Resources:
     Properties:
       HostedZoneId: !Ref DNSZoneId
       Name: !Sub
-        - "${AWS::Region}-${AWS::StackName}-sentry.${DNSZoneDomain}"
-        - { DNSZoneDomain: !Ref DNSZoneDomain }
+        - "${Hostname}.${DNSZone}"
+        - DNSZone: !Ref DNSZoneDomain
+          Hostname: !If [UseCustomDNSHostname, !Ref CustomDNSHostname, !Sub "${AWS::Region}-${AWS::StackName}-sentry"]
       Type: A
       AliasTarget:
         HostedZoneId: !GetAtt SentryElasticLoadBalancer.CanonicalHostedZoneNameID
@@ -496,7 +499,7 @@ Resources:
     Version: '1.0'
     Properties:
       ServiceToken: !GetAtt ACMApproverFunction.Arn
-      DomainName: !Sub "${AWS::Region}-${AWS::StackName}-sentry"
+      DomainName: !If [UseCustomDNSHostname, !Ref CustomDNSHostname, !Sub "${AWS::Region}-${AWS::StackName}-sentry"]
       DomainSuffix: !Ref DNSZoneDomain
       HostedZoneId: !Ref DNSZoneId
 
@@ -690,3 +693,10 @@ Resources:
       Timeout: 300
       Role:
         Fn::GetAtt: ACMApproverRole.Arn
+
+Outputs:
+  SentryUrl:
+    Value: !Sub
+      - "https://${Hostname}.${DNSZone}"
+      - DNSZone: !Ref DNSZoneDomain
+        Hostname: !If [UseCustomDNSHostname, !Ref CustomDNSHostname, !Sub "${AWS::Region}-${AWS::StackName}-sentry"]
