@@ -156,6 +156,7 @@ Resources:
 
   RDSSubnet0:
     Type: 'AWS::EC2::Subnet'
+    Condition: Create1stSubnet
     Properties:
       VpcId:
         Fn::ImportValue:
@@ -171,6 +172,7 @@ Resources:
           - 8
   RDSSubnet1:
     Type: 'AWS::EC2::Subnet'
+    Condition: Create2ndSubnet
     Properties:
       VpcId:
         Fn::ImportValue:
@@ -184,22 +186,14 @@ Resources:
               !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
           - 256
           - 8
-  RDSSubnetGroup:
-    Type: "AWS::RDS::DBSubnetGroup"
-    Properties:
-      DBSubnetGroupDescription: "RDS Subnet Group"
-      Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
-      SubnetIds:
-        - !Ref RDSSubnet0
-        - !Ref RDSSubnet1
-
-  CacheSubnet0:
+  RDSSubnet2:
     Type: 'AWS::EC2::Subnet'
+    Condition: Create3rdSubnet
     Properties:
       VpcId:
         Fn::ImportValue:
           !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
-      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      AvailabilityZone: !Select [ 2, !GetAZs '' ]
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
       CidrBlock: !Select
         - 202
@@ -208,8 +202,87 @@ Resources:
               !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
           - 256
           - 8
+  RDSSubnet3:
+    Type: 'AWS::EC2::Subnet'
+    Condition: Create4thSubnet
+    Properties:
+      VpcId:
+        Fn::ImportValue:
+          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      AvailabilityZone: !Select [ 3, !GetAZs '' ]
+      Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
+      CidrBlock: !Select
+        - 203
+        - !Cidr
+          - Fn::ImportValue:
+              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
+          - 256
+          - 8
+  RDSSubnet4:
+    Type: 'AWS::EC2::Subnet'
+    Condition: Create5thSubnet
+    Properties:
+      VpcId:
+        Fn::ImportValue:
+          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      AvailabilityZone: !Select [ 4, !GetAZs '' ]
+      Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
+      CidrBlock: !Select
+        - 204
+        - !Cidr
+          - Fn::ImportValue:
+              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
+          - 256
+          - 8
+  RDSSubnet5:
+    Type: 'AWS::EC2::Subnet'
+    Condition: Create6thSubnet
+    Properties:
+      VpcId:
+        Fn::ImportValue:
+          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      AvailabilityZone: !Select [ 5, !GetAZs '' ]
+      Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
+      CidrBlock: !Select
+        - 205
+        - !Cidr
+          - Fn::ImportValue:
+              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
+          - 256
+          - 8
+  RDSSubnetGroup:
+    Type: "AWS::RDS::DBSubnetGroup"
+    Condition: Create2ndSubnet
+    Properties:
+      DBSubnetGroupDescription: "RDS Subnet Group"
+      Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
+      SubnetIds:
+        - !If [ Create1stSubnet, !Ref RDSSubnet0, !Ref "AWS::NoValue"]
+        - !If [ Create2ndSubnet, !Ref RDSSubnet1, !Ref "AWS::NoValue"]
+        - !If [ Create3rdSubnet, !Ref RDSSubnet2, !Ref "AWS::NoValue"]
+        - !If [ Create4thSubnet, !Ref RDSSubnet3, !Ref "AWS::NoValue"]
+        - !If [ Create5thSubnet, !Ref RDSSubnet4, !Ref "AWS::NoValue"]
+        - !If [ Create6thSubnet, !Ref RDSSubnet5, !Ref "AWS::NoValue"]
+
+  CacheSubnet0:
+    Type: 'AWS::EC2::Subnet'
+    Condition: Create1stSubnet
+    Properties:
+      VpcId:
+        Fn::ImportValue:
+          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
+      CidrBlock: !Select
+        - 210
+        - !Cidr
+          - Fn::ImportValue:
+              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
+          - 256
+          - 8
   CacheSubnet1:
     Type: 'AWS::EC2::Subnet'
+    Condition: Create2ndSubnet
     Properties:
       VpcId:
         Fn::ImportValue:
@@ -217,7 +290,71 @@ Resources:
       AvailabilityZone: !Select [ 1, !GetAZs '' ]
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
       CidrBlock: !Select
-        - 203
+        - 211
+        - !Cidr
+          - Fn::ImportValue:
+              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
+          - 256
+          - 8
+  CacheSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Condition: Create3rdSubnet
+    Properties:
+      VpcId:
+        Fn::ImportValue:
+          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      AvailabilityZone: !Select [ 2, !GetAZs '' ]
+      Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
+      CidrBlock: !Select
+        - 212
+        - !Cidr
+          - Fn::ImportValue:
+              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
+          - 256
+          - 8
+  CacheSubnet3:
+    Type: 'AWS::EC2::Subnet'
+    Condition: Create4thSubnet
+    Properties:
+      VpcId:
+        Fn::ImportValue:
+          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      AvailabilityZone: !Select [ 3, !GetAZs '' ]
+      Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
+      CidrBlock: !Select
+        - 213
+        - !Cidr
+          - Fn::ImportValue:
+              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
+          - 256
+          - 8
+  CacheSubnet4:
+    Type: 'AWS::EC2::Subnet'
+    Condition: Create5thSubnet
+    Properties:
+      VpcId:
+        Fn::ImportValue:
+          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      AvailabilityZone: !Select [ 4, !GetAZs '' ]
+      Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
+      CidrBlock: !Select
+        - 214
+        - !Cidr
+          - Fn::ImportValue:
+              !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
+          - 256
+          - 8
+  CacheSubnet5:
+    Type: 'AWS::EC2::Subnet'
+    Condition: Create6thSubnet
+    Properties:
+      VpcId:
+        Fn::ImportValue:
+          !Join ['-', [!Ref InfrastructureStack, "VPCID"]]
+      AvailabilityZone: !Select [ 5, !GetAZs '' ]
+      Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
+      CidrBlock: !Select
+        - 215
         - !Cidr
           - Fn::ImportValue:
               !Join ['-', [!Ref InfrastructureStack, "VPCCIDR"]]
@@ -228,8 +365,12 @@ Resources:
     Properties:
       Description: "Cache Subnet Group"
       SubnetIds:
-        - !Ref CacheSubnet0
-        - !Ref CacheSubnet1
+      - !If [ Create1stSubnet, !Ref CacheSubnet0, !Ref "AWS::NoValue"]
+      - !If [ Create2ndSubnet, !Ref CacheSubnet1, !Ref "AWS::NoValue"]
+      - !If [ Create3rdSubnet, !Ref CacheSubnet2, !Ref "AWS::NoValue"]
+      - !If [ Create4thSubnet, !Ref CacheSubnet3, !Ref "AWS::NoValue"]
+      - !If [ Create5thSubnet, !Ref CacheSubnet4, !Ref "AWS::NoValue"]
+      - !If [ Create6thSubnet, !Ref CacheSubnet5, !Ref "AWS::NoValue"]
 
   ###### SecurityGroups ######
   PostgresAccessSecurityGroup:
