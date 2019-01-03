@@ -486,8 +486,9 @@ Resources:
             EOF
             ansible-playbook /tmp/sentry-formation-master/site.yml -i /tmp/sentry-formation-master/hosts
           - SentryUrl: !Sub
-            - "${AWS::Region}-${AWS::StackName}.sentry-${HostedZoneDomain}"
-            - { HostedZoneDomain: !Ref DNSZoneDomain }
+            - "${Hostname}.${DNSZone}"
+            - DNSZone: !Ref DNSZoneDomain
+              Hostname: !If [UseCustomDNSHostname, !Ref CustomDNSHostname, !Sub "${AWS::Region}-${AWS::StackName}-sentry"]
             DBHost: !GetAtt RDSSentry.Endpoint.Address
             RedisHost: !GetAtt CacheSentry.RedisEndpoint.Address
 
