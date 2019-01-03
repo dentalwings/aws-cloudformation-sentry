@@ -495,7 +495,7 @@ Resources:
     Type: AWS::AutoScaling::AutoScalingGroup
     UpdatePolicy:
       AutoScalingRollingUpdate:
-        PauseTime: PT5M
+        PauseTime: PT15M
         MaxBatchSize: 1
         MinInstancesInService: 1
     Properties:
