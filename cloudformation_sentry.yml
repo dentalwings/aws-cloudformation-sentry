@@ -142,15 +142,23 @@ Resources:
   GetResourceTags:
     Type: Custom::GetParameterAsTags
     Version: 1.0
+    DependsOn: InfrastructureStack
     Properties:
       ServiceToken: !GetAtt InfrastructureStack.Outputs.TagParser
+      data: !Ref Tags
+
+  GetResourceTagsASG:
+    Type: Custom::GetParameterAsTags
+    Version: 1.0
+    DependsOn: InfrastructureStack
+    Properties:
+      ServiceToken: !GetAtt InfrastructureStack.Outputs.TagParserASG
       data: !Ref Tags
 
   InfrastructureStack:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: https://s3.ca-central-1.amazonaws.com/dentalwings-cloudformation-templates/aws-cloudformation-vpc-setup/cloudformation_vpc_creation.yml
-      Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
       Parameters:
         Tags: !If [hasTags, !Ref Tags, !Ref "AWS::NoValue"]
 
@@ -490,7 +498,7 @@ Resources:
       MinSize: !Ref SentryScalingMinNodes
       MaxSize: !Ref SentryScalingMaxNodes
       LaunchConfigurationName: !Ref SentryLaunchConfiguration
-      Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
+      Tags: !If [hasTags, !GetAtt GetResourceTagsASG.result, !Ref "AWS::NoValue"]
       VPCZoneIdentifier: !Split [',', !GetAtt InfrastructureStack.Outputs.PublicSubnets]
 
   # ACM SSL Cert
