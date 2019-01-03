@@ -33,6 +33,12 @@ Parameters:
     Default: SentryPassword
     Description: Password for default database user
     NoEcho: true
+  SentryOwner:
+    Type: String
+    Default: sentry
+    MinLength: '1'
+    MaxLength: '30'
+    Description: Owner for Sentry
   SentryAdminUser:
     Type: String
     Default: admin
@@ -456,7 +462,7 @@ Resources:
             127.0.0.1
             [aws:vars]
             user=ubuntu
-            owner="${AWS::StackName}"
+            owner="${SentryOwner}"
             sentry_admin_username="${SentryAdminUser}"
             sentry_admin_password="${SentryAdminPassword}"
             sentry_public_dns_name="${SentryUrl}"
