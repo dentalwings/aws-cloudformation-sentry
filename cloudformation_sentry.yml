@@ -378,9 +378,35 @@ Resources:
   SentryFilesS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Join ['-', [!Ref 'AWS::Region', !Ref 'AWS::StackName', '-sentry-files']]
+      BucketName: !Join ['-', [!Ref 'AWS::AccountId', !Ref 'AWS::Region', !Ref 'AWS::StackName', 'sentry-files']]
       Tags: !If [hasTags, !GetAtt GetResourceTags.result, !Ref "AWS::NoValue"]
       AccessControl: Private
+
+  SentryS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SentryFilesS3Bucket
+      PolicyDocument:
+        Statement:
+          -
+            Action:
+              - "*"
+            Effect: "Allow"
+            Principal:
+              AWS: !GetAtt SentryRole.Arn
+            Resource:
+              Fn::Join:
+                - ""
+                -
+                  - !GetAtt SentryFilesS3Bucket.Arn
+                  - "/*"
+          -
+            Action:
+              - "*"
+            Effect: "Allow"
+            Principal:
+              AWS: !GetAtt SentryRole.Arn
+            Resource: !GetAtt SentryFilesS3Bucket.Arn
 
   ###### Redis Cache ######
   CacheSentry:
@@ -482,7 +508,7 @@ Resources:
             sentry_mail_username="${SentryMailUsername}"
             sentry_mail_password="${SentryMailPassword}"
             sentry_mail_from="${SentryMailFrom}"
-            sentry_files_bucket_name="${AWS::AccountId}-${AWS::StackName}-sentry-files"
+            sentry_files_bucket_name="${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-sentry-files"
             EOF
             ansible-playbook /tmp/sentry-formation-master/site.yml -i /tmp/sentry-formation-master/hosts
           - SentryUrl: !Sub
