@@ -109,9 +109,9 @@ Mappings:
     # ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*
     # ToDo: move this to a Lambda Function and dynamically lookup AMIID
     #       https://docs.aws.amazon.com/de_de/AWSCloudFormation/latest/UserGuide/walkthrough-custom-resources-lambda-lookup-amiids.html
-    ca-central-1: {"64": "ami-02d6a1670b736f1bb"}
-    us-west-1: {"64": "ami-08945b3352c7bf9c0"}
-    us-east-1: {"64": "ami-0f9cf087c1f27d9b1"}
+    ca-central-1: {"64": "ami-0086bcfbab4b22f60"}
+    us-west-1: {"64": "ami-0c0e5a396959508b0"}
+    us-east-1: {"64": "ami-09f9d773751b9d606"}
 
   # ToDo: move this mapping to a Lambda Function and get the available Zones during launch
   Regions:
