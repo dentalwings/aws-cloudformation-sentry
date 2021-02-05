@@ -510,7 +510,7 @@ Resources:
             sentry_mail_from="${SentryMailFrom}"
             sentry_files_bucket_name="${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-sentry-files"
             EOF
-            ansible-playbook /tmp/sentry-formation-master/site.yml -i /tmp/sentry-formation-master/hosts
+            ansible-playbook /tmp/sentry-formation-python3-Ubuntu20.04/site.yml -i /tmp/sentry-formation-master/hosts
           - SentryUrl: !Sub
             - "${Hostname}.${DNSZone}"
             - DNSZone: !Ref DNSZoneDomain
