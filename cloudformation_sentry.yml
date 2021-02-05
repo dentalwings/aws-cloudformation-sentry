@@ -481,9 +481,9 @@ Resources:
             apt-get update
             apt-get install ansible awscli unzip -y
             openssl req -new -nodes -x509 -subj "/C=GB/ST=London/L=London/O=Private/CN=${AWS::StackName}" -days 3650 -keyout /tmp/server.key -out /tmp/bundle.crt -extensions v3_ca
-            curl https://github.com/dentalwings/sentry-formation/archive/master.zip --output /tmp/repo.zip --location
+            curl https://github.com/dentalwings/sentry-formation/archive/python3-Ubuntu20.04.zip --output /tmp/repo.zip --location
             unzip /tmp/repo.zip -d /tmp
-            cat > /tmp/sentry-formation-master/hosts << EOF
+            cat > /tmp/sentry-formation-python3-Ubuntu20.04/hosts << EOF
             [aws]
             127.0.0.1
             [aws:vars]
@@ -510,7 +510,7 @@ Resources:
             sentry_mail_from="${SentryMailFrom}"
             sentry_files_bucket_name="${AWS::AccountId}-${AWS::Region}-${AWS::StackName}-sentry-files"
             EOF
-            ansible-playbook /tmp/sentry-formation-master/site.yml -i /tmp/sentry-formation-master/hosts
+            ansible-playbook /tmp/sentry-formation-python3-Ubuntu20.04/site.yml -i /tmp/sentry-formation-python3-Ubuntu20.04/hosts
           - SentryUrl: !Sub
             - "${Hostname}.${DNSZone}"
             - DNSZone: !Ref DNSZoneDomain
