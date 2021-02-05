@@ -109,7 +109,7 @@ Mappings:
     # ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*
     # ToDo: move this to a Lambda Function and dynamically lookup AMIID
     #       https://docs.aws.amazon.com/de_de/AWSCloudFormation/latest/UserGuide/walkthrough-custom-resources-lambda-lookup-amiids.html
-    ca-central-1: {"64": "ami-0086bcfbab4b22f60"}
+    ca-central-1: {"64": "ami-02e44367276fe7adc"}
     us-west-1: {"64": "ami-0c0e5a396959508b0"}
     us-east-1: {"64": "ami-09f9d773751b9d606"}
 
